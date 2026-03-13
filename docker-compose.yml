@@ -1,0 +1,51 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth_service/Dockerfile
+    environment:
+      - SECRET_KEY=dev-secret
+    ports:
+      - "8001:8000"
+
+  note-service:
+    build:
+      context: .
+      dockerfile: note_service/Dockerfile
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+      - auth-service
+    ports:
+      - "8002:8000"
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification_service/Dockerfile
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+    command: ["python", "main.py"]
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api_gateway/Dockerfile
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - NOTE_SERVICE_URL=http://note-service:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - note-service
