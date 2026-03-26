@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice-config
+data:
+  AUTH_SERVICE_URL: "http://auth-service:8000"
+  NOTE_SERVICE_URL: "http://note-service:8000"
+  RABBITMQ_HOST: "rabbitmq"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: microservice-secrets
+type: Opaque
+stringData:
+  SECRET_KEY: "dev-secret"
+  JWT_SECRET: "dev-secret"

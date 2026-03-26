@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: note-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: note-service
+  template:
+    metadata:
+      labels:
+        app: note-service
+    spec:
+      containers:
+      - name: note-service
+        image: note-service:latest
+        imagePullPolicy: Never
+        envFrom:
+        - configMapRef:
+            name: microservice-config
+        - secretRef:
+            name: microservice-secrets
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: note-service
+spec:
+  selector:
+    app: note-service
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

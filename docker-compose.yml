@@ -9,8 +9,8 @@ services:
     build:
       context: .
       dockerfile: auth_service/Dockerfile
-    environment:
-      - SECRET_KEY=dev-secret
+    env_file:
+      - .env
     ports:
       - "8001:8000"
 
@@ -18,9 +18,8 @@ services:
     build:
       context: .
       dockerfile: note_service/Dockerfile
-    environment:
-      - AUTH_SERVICE_URL=http://auth-service:8000
-      - RABBITMQ_HOST=rabbitmq
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
       - auth-service
@@ -31,8 +30,8 @@ services:
     build:
       context: .
       dockerfile: notification_service/Dockerfile
-    environment:
-      - RABBITMQ_HOST=rabbitmq
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
     command: ["python", "main.py"]
@@ -41,9 +40,8 @@ services:
     build:
       context: .
       dockerfile: api_gateway/Dockerfile
-    environment:
-      - AUTH_SERVICE_URL=http://auth-service:8000
-      - NOTE_SERVICE_URL=http://note-service:8000
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:
